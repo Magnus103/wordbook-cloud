@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<canvas id="board" width="400" height="400" style="border:1px solid"></canvas>
+<br>
+<button onclick="send()">让AI猜</button>
+
+<script>
+let canvas = document.getElementById("board")
+let ctx = canvas.getContext("2d")
+
+let drawing = false
+
+canvas.onmousedown = ()=> drawing=true
+canvas.onmouseup = ()=> drawing=false
+
+canvas.onmousemove = e=>{
+    if(!drawing) return
+    ctx.fillRect(e.offsetX,e.offsetY,5,5)
+}
+
+function send(){
+    let data = canvas.toDataURL()
+
+    fetch("/guess",{
+        method:"POST",
+        body:data
+    }).then(r=>r.text()).then(alert)
+}
+</script>
+
+</body>
+</html>
