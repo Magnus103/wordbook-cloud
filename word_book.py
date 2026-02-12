@@ -1,58 +1,58 @@
 import customtkinter as ctk
 import requests
-import json
 import os
 import subprocess
 from tkinter import messagebox
 
-FILE_NAME = "words.json"
+FILE_NAME = "../words.txt"
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
 
-# =============================
-# Git 云同步
-# =============================
+# ========= Git 同步 =========
 def git_pull():
     try:
-        subprocess.run("git pull", shell=True)
+        subprocess.run(["git", "pull"], check=True)
     except:
         pass
 
 
 def git_push():
     try:
-        subprocess.run("git add .", shell=True)
-        subprocess.run('git commit -m "update words"', shell=True)
-        subprocess.run("git push", shell=True)
+        subprocess.run(["git", "add", "."], check=True)
+        subprocess.run(["git", "commit", "-m", "auto sync"], check=True)
+        subprocess.run(["git", "push"], check=True)
+        messagebox.showinfo("同步成功", "已同步到云端 ☁️")
     except:
-        pass
+        messagebox.showerror("失败", "请确认已安装 Git 并已初始化仓库")
 
 
-# =============================
-# 本地数据
-# =============================
+# ========= 文件 =========
 def load_words():
-    git_pull()  # ⭐ 启动自动拉取
+    words = {}
 
-    if not os.path.exists(FILE_NAME):
-        return {}
+    if os.path.exists(FILE_NAME):
+        with open(FILE_NAME, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
 
-    with open(FILE_NAME, "r", encoding="utf-8") as f:
-        return json.load(f)
+                if not line or "|" not in line:
+                    continue
+
+                eng, ch = line.split("|", 1)  # ⭐ 修复报错核心
+                words[eng] = ch
+
+    return words
 
 
 def save_words(words):
     with open(FILE_NAME, "w", encoding="utf-8") as f:
-        json.dump(words, f, ensure_ascii=False, indent=2)
+        for eng, ch in words.items():
+            f.write(f"{eng}|{ch}\n")
 
-    git_push()  # ⭐ 保存自动上传
 
-
-# =============================
-# 翻译
-# =============================
+# ========= 翻译 =========
 def translate(word):
     try:
         url = "https://api.mymemory.translated.net/get"
@@ -63,24 +63,19 @@ def translate(word):
         return "翻译失败"
 
 
-# =============================
-# GUI
-# =============================
+# ========= GUI =========
 class WordBook(ctk.CTk):
 
     def __init__(self):
         super().__init__()
 
-        self.title("☁ Cloud Word Book")
-        self.geometry("520x650")
+        self.title("📘 Word Book (Cloud)")
+        self.geometry("520x620")
+
+        git_pull()  # ⭐ 启动自动同步
 
         self.words = load_words()
         self.show_chinese = True
-
-        self.build_ui()
-        self.refresh()
-
-    def build_ui(self):
 
         self.entry = ctk.CTkEntry(self, height=40, font=("Arial", 16))
         self.entry.pack(pady=15, padx=20, fill="x")
@@ -91,14 +86,13 @@ class WordBook(ctk.CTk):
 
         ctk.CTkButton(frame, text="添加", command=self.add_word).pack(side="left", padx=5)
         ctk.CTkButton(frame, text="隐藏中文", command=self.toggle).pack(side="left", padx=5)
-        ctk.CTkButton(frame, text="刷新", command=self.refresh).pack(side="left", padx=5)
+        ctk.CTkButton(frame, text="同步云端", command=git_push).pack(side="left", padx=5)  # ⭐ 新按钮
 
         self.listbox = ctk.CTkTextbox(self, font=("Consolas", 16))
         self.listbox.pack(fill="both", expand=True, padx=20, pady=15)
 
-    # =============================
-    # 功能
-    # =============================
+        self.refresh()
+
     def add_word(self):
         eng = self.entry.get().strip().lower()
         if not eng:
@@ -126,7 +120,6 @@ class WordBook(ctk.CTk):
         self.refresh()
 
 
-# =============================
 if __name__ == "__main__":
     app = WordBook()
     app.mainloop()
