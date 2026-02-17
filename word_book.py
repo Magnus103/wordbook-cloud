@@ -2,21 +2,32 @@ import customtkinter as ctk
 import requests
 import os
 import subprocess
+import sys
 from tkinter import messagebox
 
-# ⭐ 获取当前脚本所在目录（核心修复）
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# =========================
+# ⭐ 正确获取运行目录（兼容 exe）
+# =========================
+if getattr(sys, 'frozen', False):
+    # 如果是打包后的 exe
+    BASE_DIR = os.path.dirname(sys.executable)
+else:
+    # 如果是源码运行
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 FILE_NAME = os.path.join(BASE_DIR, "words.txt")
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
 
-# ========= Git 同步 =========
+# =========================
+# Git 同步
+# =========================
 def git_pull():
     try:
         subprocess.run(["git", "pull"], check=True, cwd=BASE_DIR)
-    except:
+    except Exception:
         pass
 
 
@@ -30,7 +41,9 @@ def git_push():
         messagebox.showerror("失败", str(e))
 
 
-# ========= 文件 =========
+# =========================
+# 文件处理
+# =========================
 def load_words():
     words = {}
 
@@ -52,7 +65,9 @@ def save_words(words):
             f.write(f"{eng}|{ch}\n")
 
 
-# ========= 翻译 =========
+# =========================
+# 翻译
+# =========================
 def translate(word):
     try:
         url = "https://api.mymemory.translated.net/get"
@@ -63,7 +78,9 @@ def translate(word):
         return "翻译失败"
 
 
-# ========= GUI =========
+# =========================
+# GUI
+# =========================
 class WordBook(ctk.CTk):
 
     def __init__(self):
