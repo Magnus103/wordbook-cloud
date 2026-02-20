@@ -1,5 +1,5 @@
 accolade|奖品
-anachronistic|不合时宜
+anachronistic        不合时宜
 contraception        避孕
 demise|v.遗赠,出租 ,传位,地产授与 ;adj.遗赠
 disoriented|丧失方向感
