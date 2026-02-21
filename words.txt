@@ -1,9 +1,10 @@
 accolade        奖品
 mediocre        平凡
 hedge           n.篱笆，障碍
-
-quant           数量
+quant           股市分析员
 duel            v.决斗
-
 segregation     n.分割
+pervasive       无孔不入
+accomplice      共犯
+
 
