@@ -1,28 +1,9 @@
-accolade|奖品
-anachronistic        不合时宜
-contraception        避孕
-demise|v.遗赠,出租 ,传位,地产授与 ;adj.遗赠
-disoriented|丧失方向感
-flirt|调情
-furtive|鬼鬼崇崇
-ginger|姜
-hallucination|n.幻觉
-heinous|令人发指的
-hung up||“挂断”
-hysterical|adj.歇斯底里 ,癔病
-imposter|n.冒名顶替者 ,骗子
-libido|性冲动
-marital|婚姻
-penetration|奸入 ,渗透
-penetrative|渗透性
-rescind|V. 撤回 ,撤销, 解除
-retaliate|v.报复
-seizure|抽搐
-stalwart|魁梧
-stringent|adj.严格
-subset|无子集
-syntax|语法
-disregard|v.无视
-repossessed|翻译失败
-smirk|冷笑
-repossession    n.返还占有, 收回
+accolade        奖品
+mediocre        平凡
+hedge           n.篱笆，障碍
+
+quant           数量
+duel            v.决斗
+
+segregation     n.分割
+

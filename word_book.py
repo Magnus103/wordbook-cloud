@@ -34,8 +34,9 @@ def git_push():
         subprocess.run(["git", "add", "."], cwd=BASE_DIR)
         subprocess.run(["git", "commit", "-m", "auto sync"], cwd=BASE_DIR)
         subprocess.run(["git", "push"], cwd=BASE_DIR)
-    except:
-        pass
+        messagebox.showinfo("成功", "已同步到云端 ☁️")
+    except Exception as e:
+        messagebox.showerror("失败", str(e))
 
 
 # =========================
@@ -65,6 +66,7 @@ class WordBook(ctk.CTk):
         git_pull()
 
         self.hide_meaning = False
+        self.original_content = ""
 
         self.entry = ctk.CTkEntry(self, height=40, font=("Arial", 16))
         self.entry.pack(pady=15, padx=20, fill="x")
@@ -82,7 +84,7 @@ class WordBook(ctk.CTk):
 
         self.load_file()
 
-        # Ctrl + S 保存
+        # Ctrl + S 只保存本地
         self.bind("<Control-s>", lambda e: self.save_file())
         self.bind("<Control-S>", lambda e: self.save_file())
 
@@ -99,7 +101,7 @@ class WordBook(ctk.CTk):
         self.display_content()
 
     # =========================
-    # 显示内容（根据隐藏状态）
+    # 显示内容
     # =========================
     def display_content(self):
         self.textbox.delete("1.0", "end")
@@ -109,46 +111,53 @@ class WordBook(ctk.CTk):
         else:
             lines = self.original_content.splitlines()
             for line in lines:
-                word = line.split()[0] if line.strip() else ""
-                self.textbox.insert("end", word + "\n")
+                if line.strip():
+                    word = line.split()[0]
+                    self.textbox.insert("end", word + "\n")
 
     # =========================
-    # 添加单词
+    # 添加单词（防止拼接）
     # =========================
     def add_word(self):
         word = self.entry.get().strip().lower()
         if not word:
             return
 
-        current_text = self.original_content
-
-        for line in current_text.splitlines():
+        for line in self.original_content.splitlines():
             if line.startswith(word + " "):
                 messagebox.showinfo("提示", "单词已存在")
                 self.entry.delete(0, "end")
                 return
 
         meaning = translate(word)
-        new_line = f"{word:<15} {meaning}\n"
 
+        # 🔥 防止上一行没有换行
+        if self.original_content and not self.original_content.endswith("\n"):
+            self.original_content += "\n"
+
+        new_line = f"{word:<15} {meaning}\n"
         self.original_content += new_line
 
         self.display_content()
         self.entry.delete(0, "end")
 
     # =========================
-    # Ctrl + S 保存
+    # 保存文件（修复 strip 吃掉换行）
     # =========================
     def save_file(self):
         if not self.hide_meaning:
-            content = self.textbox.get("1.0", "end").strip()
-            self.original_content = content
+            content = self.textbox.get("1.0", "end")
+
+            # 不使用 strip()
+            lines = content.splitlines()
+            fixed_content = "\n".join(lines) + "\n"
+
+            self.original_content = fixed_content
 
         with open(FILE_NAME, "w", encoding="utf-8") as f:
             f.write(self.original_content)
 
-        messagebox.showinfo("已保存", "保存成功 (Ctrl+S)")
-        git_push()
+        messagebox.showinfo("已保存", "已保存到本地 (Ctrl+S)")
 
     # =========================
     # 隐藏 / 显示释义
